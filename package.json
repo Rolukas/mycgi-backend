@@ -1,0 +1,29 @@
+{
+  "name": "backendteachercloud",
+  "version": "1.0.0",
+  "description": "Backend of teacher cloud",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon src/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Rolukas/BackendTeacherCloud.git"
+  },
+  "author": "Rolando Sumoza",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Rolukas/BackendTeacherCloud/issues"
+  },
+  "homepage": "https://github.com/Rolukas/BackendTeacherCloud#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "crypto-js": "^4.0.0",
+    "express": "^4.17.1",
+    "pg": "^8.4.2"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.6"
+  }
+}
