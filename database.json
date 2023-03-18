@@ -1,0 +1,10 @@
+{
+    "dev": {
+        "driver": "pg",
+        "user": "postgres",
+        "password": "",
+        "host": "localhost",
+        "database": "mycgi",
+        "port": "5432"
+    }
+}
