@@ -7,51 +7,79 @@ const pool = require("../database/db_connect");
 
 const onLogin = async (req, res) => {
   try {
-    console.log("=> OnLogin");
-
-    let authorization = req.headers.authorization;
-    //  console.log(authorization)
-    let userpass = authorization.split(" ")[1];
+    const authorization = req.headers.authorization;
+    const userpass = authorization.split(" ")[1];
     //let decodedAuth = ecrypt.decryptor(userpass);
-    let plainText = Buffer.from(userpass, "base64").toString("ascii");
+    const plainText = Buffer.from(userpass, "base64").toString("ascii");
 
     // Credentials
-    let req_username = plainText.split(":")[0]; // Username filled by user
+    const req_username = plainText.split(":")[0]; // Username filled by user
 
     //Authorize
-    let auth = await Authorize(req);
+    const auth = await Authorize(req);
     if (!auth.isAuthorized) {
       res.status(401).send({ success: false, message: auth.message });
       return false;
     }
 
     // Check if user exists
-    var response;
-    var request = await pool.query(
+    let response = {
+      success: false,
+      items: [],
+    };
+
+    const userRequest = await pool.query(
       `SELECT id  FROM "User" WHERE username = '${req_username}'`
     );
 
-    if (request.rowCount == 0) {
+    if (userRequest.rowCount === 0) {
       response = {
-        success: true,
-        items: request.rows,
-        message: "no user was found",
+        ...response,
+        message: "user not found",
       };
       res.send(response);
       return false;
     }
 
+    const profileRequest = await pool.query(
+      `SELECT * FROM "Profile" WHERE id = ${userRequest.rows[0].id}`
+    );
+
+    if (profileRequest.rowCount == 0) {
+      response = {
+        ...response,
+        message: "profile not found",
+      };
+    }
+
+    const modulesRequest = await pool.query(
+      `SELECT
+      M.Id, M.Name, MC.Name as "categoryName", MC.Id as "categoryId"
+      FROM "User"  as U
+      JOIN "UserProfile"  as UP on U.Id = UP.UserId
+      JOIN "Profile" as P on UP.ProfileId = P.Id
+      JOIN "ProfileModule"  as MP on MP.ProfileId = P.Id
+      JOIN "Module"  as M on MP.ModuleId = M.Id
+      JOIN "ModuleCategory" as MC on MC.Id = M.categoryId
+      where U.Id = ${profileRequest.rows[0].id} and M.IsActive = true;`
+    );
+
     response = {
       success: true,
-      items: [],
-      message: "login succesfull",
+      items: [
+        {
+          profileId: profileRequest.rows[0].id,
+          modules: [...modulesRequest.rows.map((module) => module)],
+          profileName: profileRequest.rows[0].name,
+        },
+      ],
+      message: "login succesful",
     };
 
     res.send(response);
   } catch (error) {
-    console.log("ERROR");
-    console.error(error);
-    res.status(401).send({ success: false, message: error.toString() });
+    console.error(error?.message);
+    res.status(500).send({ success: false, message: error.toString() });
   }
 };
 
