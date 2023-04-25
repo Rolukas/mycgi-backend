@@ -5,7 +5,7 @@ const Authorize = require("../functions/auth");
 // DB connection
 const pool = require("../database/db_connect");
 
-const onGetGroups = async (req, res) => {
+const onGetSubjects = async (req, res) => {
   try {
     //Authorize
     const auth = await Authorize(req);
@@ -14,12 +14,12 @@ const onGetGroups = async (req, res) => {
       return false;
     }
 
-    const requestGroups = await pool.query(`SELECT * FROM "Group"`);
+    const requestGroups = await pool.query(`select * from "Subject"`);
 
     let response = {
       success: true,
       items: requestGroups.rows,
-      message: "groups fetched succesfully",
+      message: "subjects fetched succesfully",
     };
 
     res.send(response);
@@ -29,7 +29,7 @@ const onGetGroups = async (req, res) => {
   }
 };
 
-const onCreateGroup = async (req, res) => {
+const onCreateSubject = async (req, res) => {
   try {
     let data = req.body;
     let response;
@@ -41,38 +41,38 @@ const onCreateGroup = async (req, res) => {
       return false;
     }
 
-    const checkIfGroupExists = await pool.query(
-      `SELECT * FROM "Group" where Fullname = '${data.level}${data.letter}'`
+    const checkIfSubjectExists = await pool.query(
+      `SELECT lower(Name) as "Name" FROM "Subject" where Name = '${data.name
+        .toLowerCase()
+        .trim()}'`
     );
 
-    console.log("=> checkIfGroupExists", checkIfGroupExists.rowCount);
-
-    if (checkIfGroupExists.rowCount !== 0) {
+    if (checkIfSubjectExists.rowCount > 0) {
       response = {
         success: false,
         items: [],
-        message: "group already created",
+        message: "subject already created",
       };
 
       res.send(response);
       return false;
     }
 
-    const createNewGroup = await pool.query(
-      `insert into "Group"(Letter, Level, Fullname, IsActive) values ('${data.level}', '${data.letter}', '${data.level}${data.letter}', true)`
+    const createNewSubject = await pool.query(
+      `insert into "Subject"(Code, Name, IsActive) values ('0000', '${data.name.trim()}', true);`
     );
 
-    if (createNewGroup.rowCount > 0) {
+    if (createNewSubject.rowCount > 0) {
       response = {
         success: true,
         items: [],
-        message: "group created succesfully",
+        message: "subject created succesfully",
       };
     } else {
       response = {
         success: false,
         items: [],
-        message: "cannot create group",
+        message: "subject not created",
       };
     }
 
@@ -84,6 +84,6 @@ const onCreateGroup = async (req, res) => {
 };
 
 module.exports = {
-  onGetGroups,
-  onCreateGroup,
+  onGetSubjects,
+  onCreateSubject,
 };

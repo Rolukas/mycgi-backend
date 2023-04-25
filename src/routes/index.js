@@ -16,6 +16,10 @@ const {
   onCreateTeacher,
   onGetTeachers,
 } = require("../controllers/teacher.controller");
+const {
+  onGetSubjects,
+  onCreateSubject,
+} = require("../controllers/subject.controller");
 
 // Login
 router.get("/api/Login", onLogin);
@@ -31,5 +35,9 @@ router.post("/api/Student", onCreateStudent);
 // Teacher
 router.get("/api/Teacher", onGetTeachers);
 router.post("/api/Teacher", onCreateTeacher);
+
+// Subject
+router.get("/api/Subject", onGetSubjects);
+router.post("/api/Subject", onCreateSubject);
 
 module.exports = router;
