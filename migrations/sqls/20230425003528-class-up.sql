@@ -4,7 +4,9 @@ CREATE TABLE IF NOT EXISTS "Class"(
     Id SERIAL PRIMARY KEY,
     IsActive BOOL NOT NULL,
     SubjectId integer references "Subject" (Id),
-    TeacherId integer references "Teacher" (Id)
+    TeacherId integer references "Teacher" (Id),
+    StartHour VARCHAR(10) NOT NULL,
+    EndHour VARCHAR(10) NOT NULL
 );
 
 -- Classes

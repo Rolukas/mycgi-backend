@@ -43,6 +43,7 @@ const onCreateStudent = async (req, res) => {
       return false;
     }
 
+    // CHECK IF STUDENT EXISTS
     const checkIfStudentExists = await pool.query(
       `SELECT * FROM "Student" where Email = '${data.email}'`
     );
@@ -58,6 +59,37 @@ const onCreateStudent = async (req, res) => {
       return false;
     }
 
+    // CREATE USER FOR STUDENT
+    const createNewUser = await pool.query(
+      `insert into "User" (username, "password", isactive) values ('${data.email}', '${data.password}', true) RETURNING id;`
+    );
+
+    if (createNewUser.rowCount < 0) {
+      response = {
+        success: false,
+        items: [],
+        message: "user not created",
+      };
+      res.send(response);
+    }
+
+    const createdId = createNewUser.rows[0].id;
+
+    // CREATE USER ROLE
+    const createNewUserRole = await pool.query(
+      `insert into "UserProfile" (UserId, ProfileId) values (${createdId}, 3);`
+    );
+
+    if (createNewUserRole.rowCount < 0) {
+      response = {
+        success: false,
+        items: [],
+        message: "user role not created",
+      };
+      res.send(response);
+    }
+
+    // CREATE STUDENT
     const createNewStudent = await pool.query(
       `insert into "Student"(Code, Name, FatherLastname, MotherLastname, IsActive, GroupId, HasPaid, Email) values ('0000', '${data.name}', '${data.fatherLastName}', '${data.motherLastName}', true, ${data.groupId}, true, '${data.email}');`
     );
