@@ -16,8 +16,8 @@ insert into "Module"(name, categoryid, isactive) values ('Agregar Clase', 5, tru
 insert into "ProfileModule"(ProfileId, ModuleId) values (1, 9);
 insert into "ProfileModule"(ProfileId, ModuleId) values (1, 10);
 
-insert into "Class"(IsActive, SubjectId, TeacherId)
-values (true, 1, 1);
+insert into "Class"(IsActive, SubjectId, TeacherId, StartHour, EndHour)
+values (true, 1, 1, '9:00', '10:00');
 
 -- StudentClass
 CREATE TABLE IF NOT EXISTS "StudentClass"(
@@ -26,5 +26,5 @@ CREATE TABLE IF NOT EXISTS "StudentClass"(
     ClassId integer references "Class" (Id)
 );
 
-insert into "StudentClass"(SubjectId, TeacherId)
+insert into "StudentClass"(StudentId, ClassId)
 values (1, 1);
