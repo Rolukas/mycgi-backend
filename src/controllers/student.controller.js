@@ -14,11 +14,17 @@ const onGetStudents = async (req, res) => {
       return false;
     }
 
-    const requestGroups =
-      await pool.query(`SELECT s.Id, s.Code, s.Name, s.FatherLastname, g.Fullname as "group" FROM "Student" as s
-    join "Group" as g on g.id = s.groupId;`);
+    const requestGroups = await pool.query(`SELECT 
+      s.Id, 
+      s.Code, 
+      s.Name, 
+      s.FatherLastname, 
+      g.Fullname as "group",
+      (select count(*) from "StudentClass" sc where sc.StudentId = s.Id) as "numberOfClasses"
+      FROM "Student" as s
+      join "Group" as g on g.id = s.groupId;`);
 
-    let response = {
+    const response = {
       success: true,
       items: requestGroups.rows,
       message: "students fetched succesfully",
