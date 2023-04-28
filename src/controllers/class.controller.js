@@ -14,9 +14,31 @@ const onGetClasses = async (req, res) => {
       return false;
     }
 
-    let response = {
+    let response;
+
+    const requestClasses = await pool.query(
+      `select c.Id, 
+        concat(t.Name, ' ', t.fatherlastname, ' ', t.motherlastname) as "teacherName",
+        s.Name as "subjectName",
+        (select count(*) from "StudentClass" sc where sc.ClassId = c.Id) as "numberOfStudents"
+        from "Class" c
+        join "Teacher" t on t.Id = c.TeacherId
+        join "Subject" s on s.Id = c.SubjectId`
+    );
+
+    if (requestClasses.rowCount === 0) {
+      response = {
+        success: false,
+        items: [],
+        message: "cannot get classes",
+      };
+      res.send(response);
+      return;
+    }
+
+    response = {
       success: true,
-      items: [],
+      items: requestClasses.rows,
       message: "students fetched succesfully",
     };
 
