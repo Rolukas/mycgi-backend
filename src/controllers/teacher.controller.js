@@ -4,6 +4,7 @@ const Authorize = require("../functions/auth");
 
 // DB connection
 const pool = require("../database/db_connect");
+const { createUser } = require("../functions/userFunctions");
 
 const onGetTeachers = async (req, res) => {
   try {
@@ -15,7 +16,12 @@ const onGetTeachers = async (req, res) => {
     }
 
     const requestGroups = await pool.query(
-      `SELECT Id, Name, FatherLastname FROM "Teacher"`
+      `SELECT 
+      t.Id, 
+      t.Name, 
+      t.FatherLastname,
+      (select count(*) from "Class" c where c.TeacherId = t.Id) as "numberOfClasses"
+      FROM "Teacher" t`
     );
 
     let response = {
@@ -52,6 +58,25 @@ const onCreateTeacher = async (req, res) => {
         success: false,
         items: [],
         message: "teacher already created",
+      };
+
+      res.send(response);
+      return false;
+    }
+
+    // CREATE USER FOR TEACHER
+    const teacherRoleId = 2;
+    const wasUserCreated = await createUser(
+      data.email,
+      data.password,
+      teacherRoleId
+    );
+
+    if (!wasUserCreated) {
+      response = {
+        success: false,
+        items: [],
+        message: "cannot create user",
       };
 
       res.send(response);

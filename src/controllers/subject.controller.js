@@ -14,7 +14,14 @@ const onGetSubjects = async (req, res) => {
       return false;
     }
 
-    const requestGroups = await pool.query(`select * from "Subject"`);
+    const requestGroups = await pool.query(`
+      select
+      s.Id,
+      s.Code,
+      s.Name,
+      (select count(*) from "Class" c where c.SubjectId = s.Id) as "numberOfClasses"
+      from "Subject" s
+    `);
 
     let response = {
       success: true,

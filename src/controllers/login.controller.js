@@ -29,12 +29,13 @@ const onLogin = async (req, res) => {
     };
 
     const userRequest = await pool.query(
-      `SELECT id  FROM "User" WHERE username = '${req_username}'`
+      `SELECT id FROM "User" WHERE username = '${req_username}'`
     );
 
     if (userRequest.rowCount === 0) {
       response = {
-        ...response,
+        success: false,
+        items: [],
         message: "user not found",
       };
       res.send(response);
@@ -42,13 +43,16 @@ const onLogin = async (req, res) => {
     }
 
     const profileRequest = await pool.query(
-      `SELECT * FROM "Profile" WHERE id = ${userRequest.rows[0].id}`
+      `select p.Id, p.Name FROM "UserProfile" up 
+      JOIN "Profile" p on p.Id = up.ProfileId
+      WHERE UserId = ${userRequest.rows[0].id}`
     );
 
     if (profileRequest.rowCount == 0) {
       response = {
-        ...response,
-        message: "profile not found",
+        success: false,
+        items: [],
+        message: "user not found",
       };
     }
 
@@ -61,7 +65,7 @@ const onLogin = async (req, res) => {
       JOIN "ProfileModule"  as MP on MP.ProfileId = P.Id
       JOIN "Module"  as M on MP.ModuleId = M.Id
       JOIN "ModuleCategory" as MC on MC.Id = M.categoryId
-      where U.Id = ${profileRequest.rows[0].id} and M.IsActive = true;`
+      where U.Id = ${userRequest.rows[0].id} and M.IsActive = true;`
     );
 
     response = {

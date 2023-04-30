@@ -4,6 +4,7 @@ const Authorize = require("../functions/auth");
 
 // DB connection
 const pool = require("../database/db_connect");
+const { createUser } = require("../functions/userFunctions");
 
 const onGetStudents = async (req, res) => {
   try {
@@ -22,7 +23,8 @@ const onGetStudents = async (req, res) => {
       g.Fullname as "group",
       (select count(*) from "StudentClass" sc where sc.StudentId = s.Id) as "numberOfClasses"
       FROM "Student" as s
-      join "Group" as g on g.id = s.groupId;`);
+      join "Group" as g on g.id = s.groupId;
+    `);
 
     const response = {
       success: true,
@@ -66,33 +68,22 @@ const onCreateStudent = async (req, res) => {
     }
 
     // CREATE USER FOR STUDENT
-    const createNewUser = await pool.query(
-      `insert into "User" (username, "password", isactive) values ('${data.email}', '${data.password}', true) RETURNING id;`
+    const studentRoleId = 3;
+    const wasUserCreated = await createUser(
+      data.email,
+      data.password,
+      studentRoleId
     );
 
-    if (createNewUser.rowCount < 0) {
+    if (!wasUserCreated) {
       response = {
         success: false,
         items: [],
-        message: "user not created",
+        message: "cannot create user",
       };
+
       res.send(response);
-    }
-
-    const createdId = createNewUser.rows[0].id;
-
-    // CREATE USER ROLE
-    const createNewUserRole = await pool.query(
-      `insert into "UserProfile" (UserId, ProfileId) values (${createdId}, 3);`
-    );
-
-    if (createNewUserRole.rowCount < 0) {
-      response = {
-        success: false,
-        items: [],
-        message: "user role not created",
-      };
-      res.send(response);
+      return false;
     }
 
     // CREATE STUDENT
