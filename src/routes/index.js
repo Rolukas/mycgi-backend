@@ -23,6 +23,7 @@ const {
 const {
   onGetClasses,
   onCreateClass,
+  onGetClassesByTeacher,
 } = require("../controllers/class.controller");
 
 // Login
@@ -46,6 +47,7 @@ router.post("/api/Subject", onCreateSubject);
 
 // Class
 router.get("/api/Class", onGetClasses);
+router.get("/api/ClassesByTeacher", onGetClassesByTeacher);
 router.post("/api/Class", onCreateClass);
 
 module.exports = router;

@@ -67,6 +67,29 @@ const createUserRole = async (userId, roleId) => {
   }
 };
 
+const getUserIdByRequestAuthorizationHeaders = async (req) => {
+  try {
+    const authorization = req.headers.authorization;
+    const userpass = authorization.split(" ")[1];
+    const plainText = Buffer.from(userpass, "base64").toString("ascii");
+    const req_username = plainText.split(":")[0];
+    const userRequest = await pool.query(
+      `SELECT Id FROM "User" where username = '${req_username}'`
+    );
+
+    if (userRequest.rowCount > 0) {
+      const userId = userRequest.rows[0].id;
+      return userId;
+    }
+
+    return 0;
+  } catch (error) {
+    console.error(error);
+    return 0;
+  }
+};
+
 module.exports = {
   createUser,
+  getUserIdByRequestAuthorizationHeaders,
 };

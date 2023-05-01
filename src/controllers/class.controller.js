@@ -4,6 +4,9 @@ const Authorize = require("../functions/auth");
 
 // DB connection
 const pool = require("../database/db_connect");
+const {
+  getUserIdByRequestAuthorizationHeaders,
+} = require("../functions/userFunctions");
 
 const onGetClasses = async (req, res) => {
   try {
@@ -18,12 +21,13 @@ const onGetClasses = async (req, res) => {
 
     const requestClasses = await pool.query(
       `select c.Id, 
-        concat(t.Name, ' ', t.fatherlastname, ' ', t.motherlastname) as "teacherName",
-        s.Name as "subjectName",
-        (select count(*) from "StudentClass" sc where sc.ClassId = c.Id) as "numberOfStudents"
-        from "Class" c
-        join "Teacher" t on t.Id = c.TeacherId
-        join "Subject" s on s.Id = c.SubjectId`
+      concat(t.Name, ' ', t.fatherlastname, ' ', t.motherlastname) as "teacherName",
+      s.Name as "subjectName",
+      (select count(*) from "StudentClass" sc where sc.ClassId = c.Id) as "numberOfStudents",
+      c.days
+      from "Class" c
+      join "Teacher" t on t.Id = c.TeacherId
+      join "Subject" s on s.Id = c.SubjectId`
     );
 
     if (requestClasses.rowCount === 0) {
@@ -61,10 +65,10 @@ const onCreateClass = async (req, res) => {
       return false;
     }
 
-    const { subjectId, teacherId, startHour, endHour, students } = data;
+    const { subjectId, teacherId, startHour, endHour, students, days } = data;
 
     const createClass = await pool.query(
-      `INSERT INTO "Class" (SubjectId, TeacherId, StartHour, EndHour, IsActive) VALUES (${subjectId}, ${teacherId}, '${startHour}', '${endHour}', true) RETURNING id`
+      `INSERT INTO "Class" (SubjectId, TeacherId, StartHour, EndHour, IsActive, Days) VALUES (${subjectId}, ${teacherId}, '${startHour}', '${endHour}', true, '${days}') RETURNING id`
     );
 
     if (createClass.rowCount < 0) {
@@ -111,7 +115,67 @@ const onCreateClass = async (req, res) => {
   }
 };
 
+const onGetClassesByTeacher = async (req, res) => {
+  try {
+    let response;
+
+    //Authorize
+    const auth = await Authorize(req);
+    if (!auth.isAuthorized) {
+      res.status(401).send({ success: false, message: auth.message });
+      return false;
+    }
+
+    const userId = await getUserIdByRequestAuthorizationHeaders(req);
+
+    if (userId === 0) {
+      response = {
+        success: false,
+        items: [],
+        message: "cannot get user",
+      };
+      res.send(response);
+      return;
+    }
+
+    const getClassesRequest = await pool.query(`
+      select c.Id, 
+      s.Name as "subjectName",
+      (select count(*) from "StudentClass" sc where sc.ClassId = c.Id) as "numberOfStudents",
+      c.days,
+      c.startHour,
+      c.endHour
+      from "Class" c
+      join "Teacher" t on t.Id = c.TeacherId
+      join "Subject" s on s.Id = c.SubjectId
+      where c.TeacherId = ${userId};
+    `);
+
+    if (getClassesRequest.rowCount === 0) {
+      response = {
+        success: false,
+        items: [],
+        message: "cannot get classes",
+      };
+      res.send(response);
+      return;
+    }
+
+    response = {
+      success: true,
+      items: getClassesRequest.rows,
+      message: "operation completed with success",
+    };
+
+    res.send(response);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ success: false, message: error.toString() });
+  }
+};
+
 module.exports = {
   onGetClasses,
   onCreateClass,
+  onGetClassesByTeacher,
 };
