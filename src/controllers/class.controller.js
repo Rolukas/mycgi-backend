@@ -108,6 +108,15 @@ const onCreateClass = async (req, res) => {
       };
     }
 
+    // Create 14 weeks
+    for (let i = 1; i <= 14; i++) {
+      const insertWeek = await pool.query(`
+        INSERT INTO "Week"(Number, ClassId, IsLocked, IsActive) VALUES (${i}, ${classId}, false, true);
+      `);
+
+      if (insertWeek.rowCount === 0) console.error("cannot insert week");
+    }
+
     res.send(response);
   } catch (error) {
     console.error(error);
@@ -242,8 +251,63 @@ const onGetClassesByTeacher = async (req, res) => {
   }
 };
 
+const onGetClassWeeks = async (req, res) => {
+  try {
+    let response;
+
+    //Authorize
+    const auth = await Authorize(req);
+    if (!auth.isAuthorized) {
+      res.status(401).send({ success: false, message: auth.message });
+      return false;
+    }
+
+    const classId = req.params.id;
+
+    if (classId == null) {
+      response = {
+        success: false,
+        items: [],
+        message: "invalid class id",
+      };
+      res.send(response);
+      return;
+    }
+
+    const weeksRequest = await pool.query(`
+      select 
+      w.Id,
+      w.Number,
+      w.IsLocked
+      from "Week" w where w.ClassId = ${classId} order by number asc
+    `);
+
+    if (weeksRequest.rowCount === 0) {
+      response = {
+        success: false,
+        items: [],
+        message: "cannot get weeks",
+      };
+      res.send(weeksRequest);
+      return;
+    }
+
+    response = {
+      success: true,
+      items: weeksRequest.rows,
+      message: "operation completed with success",
+    };
+
+    res.send(response);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ success: false, message: error.toString() });
+  }
+};
+
 module.exports = {
   onGetClasses,
   onCreateClass,
   onGetClassesByTeacher,
+  onGetClassWeeks,
 };

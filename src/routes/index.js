@@ -25,6 +25,7 @@ const {
   onGetClasses,
   onCreateClass,
   onGetClassesByTeacher,
+  onGetClassWeeks,
 } = require("../controllers/class.controller");
 const { onTakeAttendance } = require("../controllers/attendance.controller");
 
@@ -51,6 +52,7 @@ router.post("/api/Subject", onCreateSubject);
 // Class
 router.get("/api/Class", onGetClasses);
 router.get("/api/ClassesByTeacher", onGetClassesByTeacher);
+router.get("/api/WeeksByClass/:id", onGetClassWeeks);
 router.post("/api/Class", onCreateClass);
 
 // Attendance
