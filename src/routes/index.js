@@ -11,6 +11,7 @@ const {
 const {
   onGetStudents,
   onCreateStudent,
+  onGetStudentsByClass,
 } = require("../controllers/student.controller");
 const {
   onCreateTeacher,
@@ -25,6 +26,7 @@ const {
   onCreateClass,
   onGetClassesByTeacher,
 } = require("../controllers/class.controller");
+const { onTakeAttendance } = require("../controllers/attendance.controller");
 
 // Login
 router.get("/api/Login", onLogin);
@@ -35,6 +37,7 @@ router.post("/api/Group", onCreateGroup);
 
 // Student
 router.get("/api/Student", onGetStudents);
+router.get("/api/StudentsByClass/:id", onGetStudentsByClass);
 router.post("/api/Student", onCreateStudent);
 
 // Teacher
@@ -49,5 +52,8 @@ router.post("/api/Subject", onCreateSubject);
 router.get("/api/Class", onGetClasses);
 router.get("/api/ClassesByTeacher", onGetClassesByTeacher);
 router.post("/api/Class", onCreateClass);
+
+// Attendance
+router.post("/api/Attendance", onTakeAttendance);
 
 module.exports = router;

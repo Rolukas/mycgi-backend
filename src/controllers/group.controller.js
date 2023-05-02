@@ -53,8 +53,6 @@ const onCreateGroup = async (req, res) => {
       `SELECT * FROM "Group" where Fullname = '${data.level}${data.letter}'`
     );
 
-    console.log("=> checkIfGroupExists", checkIfGroupExists.rowCount);
-
     if (checkIfGroupExists.rowCount !== 0) {
       response = {
         success: false,

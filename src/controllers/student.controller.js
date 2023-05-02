@@ -112,7 +112,68 @@ const onCreateStudent = async (req, res) => {
   }
 };
 
+const onGetStudentsByClass = async (req, res) => {
+  try {
+    //Authorize
+    const auth = await Authorize(req);
+    if (!auth.isAuthorized) {
+      res.status(401).send({ success: false, message: auth.message });
+      return false;
+    }
+
+    let response;
+
+    const classId = req.params.id;
+
+    if (classId == null) {
+      response = {
+        success: false,
+        items: [],
+        message: "invalid class id",
+      };
+      res.send(response);
+      return;
+    }
+
+    const studentsRequest = await pool.query(`
+      select 
+      s.Id,
+      s.code,
+      s."name",
+      s.fatherlastname,
+      s.motherlastname,
+      g.fullname as "group"
+      from "StudentClass" sc
+      join "Student" s on s.Id = sc.studentid
+      join "Group" g on g.Id = s.groupid 
+      where classid = ${classId} order by s."name" asc
+    `);
+
+    if (studentsRequest.rowCount === 0) {
+      response = {
+        success: false,
+        items: [],
+        message: "cannot get students",
+      };
+      res.send(response);
+      return;
+    }
+
+    response = {
+      success: true,
+      items: studentsRequest.rows,
+      message: "operation completed succesfully",
+    };
+
+    res.send(response);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ success: false, message: error.toString() });
+  }
+};
+
 module.exports = {
   onGetStudents,
   onCreateStudent,
+  onGetStudentsByClass,
 };
