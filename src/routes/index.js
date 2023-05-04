@@ -28,6 +28,10 @@ const {
   onGetClassWeeks,
 } = require("../controllers/class.controller");
 const { onTakeAttendance } = require("../controllers/attendance.controller");
+const {
+  onGetStudentsToGrade,
+  onRegisterGrades,
+} = require("../controllers/grades.controller");
 
 // Login
 router.get("/api/Login", onLogin);
@@ -57,5 +61,9 @@ router.post("/api/Class", onCreateClass);
 
 // Attendance
 router.post("/api/Attendance", onTakeAttendance);
+
+// Grades
+router.get("/api/StudentsToGrade/:id", onGetStudentsToGrade);
+router.post("/api/Grades/", onRegisterGrades);
 
 module.exports = router;

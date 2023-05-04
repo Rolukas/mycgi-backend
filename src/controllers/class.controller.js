@@ -278,7 +278,7 @@ const onGetClassWeeks = async (req, res) => {
       select 
       w.Id,
       w.Number,
-      w.IsLocked
+      w.IsLocked as "isLocked"
       from "Week" w where w.ClassId = ${classId} order by number asc
     `);
 
