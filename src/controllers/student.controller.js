@@ -69,13 +69,13 @@ const onCreateStudent = async (req, res) => {
 
     // CREATE USER FOR STUDENT
     const studentRoleId = 3;
-    const wasUserCreated = await createUser(
+    const userIdCreated = await createUser(
       data.email,
       data.password,
       studentRoleId
     );
 
-    if (!wasUserCreated) {
+    if (userIdCreated === 0) {
       response = {
         success: false,
         items: [],
@@ -88,7 +88,7 @@ const onCreateStudent = async (req, res) => {
 
     // CREATE STUDENT
     const createNewStudent = await pool.query(
-      `insert into "Student"(Code, Name, FatherLastname, MotherLastname, IsActive, GroupId, HasPaid, Email) values ('0000', '${data.name}', '${data.fatherLastName}', '${data.motherLastName}', true, ${data.groupId}, true, '${data.email}');`
+      `insert into "Student"(UserId, Code, Name, FatherLastname, MotherLastname, IsActive, GroupId, HasPaid, Email) values (${userIdCreated}, '0000', '${data.name}', '${data.fatherLastName}', '${data.motherLastName}', true, ${data.groupId}, true, '${data.email}');`
     );
 
     if (createNewStudent.rowCount > 0) {

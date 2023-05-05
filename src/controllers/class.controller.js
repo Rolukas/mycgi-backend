@@ -7,6 +7,7 @@ const pool = require("../database/db_connect");
 const {
   getUserIdByRequestAuthorizationHeaders,
 } = require("../functions/userFunctions");
+const { getTeacherIdByUserId } = require("../functions/teacherFunctions");
 
 const onGetClasses = async (req, res) => {
   try {
@@ -147,6 +148,18 @@ const onGetClassesByTeacher = async (req, res) => {
       return;
     }
 
+    const teacherId = await getTeacherIdByUserId(userId);
+
+    if (!teacherId || teacherId === 0) {
+      response = {
+        success: false,
+        items: [],
+        message: "cannot get teacherId",
+      };
+      res.send(response);
+      return;
+    }
+
     const getClassesRequest = await pool.query(`
       select c.Id, 
       s.Name as "subjectName",
@@ -164,7 +177,7 @@ const onGetClassesByTeacher = async (req, res) => {
       from "Class" c
       join "Teacher" t on t.Id = c.TeacherId
       join "Subject" s on s.Id = c.SubjectId
-      where c.TeacherId = ${userId};
+      where c.TeacherId = ${teacherId};
     `);
 
     if (getClassesRequest.rowCount === 0) {
@@ -240,7 +253,7 @@ const onGetClassesByTeacher = async (req, res) => {
 
     response = {
       success: true,
-      items: classes.filter((classData) => classData.isToday), // Only returns today classes
+      items: classes, // Only returns today classes
       message: "operation completed with success",
     };
 

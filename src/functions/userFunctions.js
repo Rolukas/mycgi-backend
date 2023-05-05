@@ -18,7 +18,7 @@ const createUser = async (email, password, roleId) => {
 
     if (checkIfUserExists.rowCount > 0) {
       console.error("user already exists");
-      return false;
+      return 0;
     }
 
     const createNewUser = await pool.query(
@@ -28,20 +28,20 @@ const createUser = async (email, password, roleId) => {
     if (createNewUser.rowCount === 0) {
       console.error("cannot create user");
       console.error(createNewUser);
-      return false;
+      return 0;
     }
 
     const createdUserId = createNewUser.rows[0].id;
 
     if (createdUserId && createUserRole(createdUserId, roleId)) {
-      return true;
+      return createdUserId;
     }
 
     console.error("cannot create userId");
-    return false;
+    return 0;
   } catch (e) {
     console.error(e);
-    return false;
+    return 0;
   }
 };
 

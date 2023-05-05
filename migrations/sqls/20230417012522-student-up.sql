@@ -2,6 +2,7 @@
 
 CREATE TABLE IF NOT EXISTS "Student"(
     Id SERIAL PRIMARY KEY,
+    UserId integer references "User" (Id),
     Code VARCHAR(256) NOT NULL,
     Name VARCHAR(256) NOT NULL,
     FatherLastname VARCHAR(256) NOT NULL,
@@ -12,4 +13,5 @@ CREATE TABLE IF NOT EXISTS "Student"(
     HasPaid BOOL NOT NULL
 );
 
-insert into "Student"(Code, Name, FatherLastname, MotherLastname, Email, IsActive, GroupId, HasPaid) values ('2749631', 'Juan', 'Perez', 'Martinez', 'admin@admin.com', true, 1, true);
+insert into "User" (username, "password", isactive) values ('rolando.student@cgi.com', 'student', true);
+insert into "Student"(UserId, Code, Name, FatherLastname, MotherLastname, Email, IsActive, GroupId, HasPaid) values (2, '2749631', 'Rolando', 'Student', 'Rivas', 'rolando.student@cgi.com', true, 1, true);
