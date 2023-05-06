@@ -29,7 +29,11 @@ CREATE TABLE IF NOT EXISTS "ProfileModule"(
     ModuleId integer references "Module" (Id)
 );
 
+-- Perfiles
 insert into "Profile"(Name, IsActive) values ('Directivo', true);
+insert into "Profile"(Name, IsActive) values ('Maestro', true);
+insert into "Profile"(Name, IsActive) values ('Alumno', true);
+
 insert into "UserProfile"(UserId, ProfileId) values (1, 1);
 -- Alumnos
 insert into "ModuleCategory"(Name, IsActive) values ('Alumnos', true);

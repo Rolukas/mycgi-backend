@@ -13,5 +13,6 @@ CREATE TABLE IF NOT EXISTS "Teacher"(
 
 
 insert into "User" (username, "password", isactive) values ('rolando.teacher@cgi.com', 'teacher', true);
+insert into "UserProfile"(UserId, ProfileId) values (3, 2);
 insert into "Teacher"(UserId, Code, Name, FatherLastname, MotherLastname, Email, IsActive)
 values (3, '0000', 'Rolando', 'Teacher', 'Rivas', 'rolando.teacher@cgi.com', true);

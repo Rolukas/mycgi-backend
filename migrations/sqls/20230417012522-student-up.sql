@@ -14,4 +14,6 @@ CREATE TABLE IF NOT EXISTS "Student"(
 );
 
 insert into "User" (username, "password", isactive) values ('rolando.student@cgi.com', 'student', true);
+insert into "UserProfile"(UserId, ProfileId) values (2, 3);
 insert into "Student"(UserId, Code, Name, FatherLastname, MotherLastname, Email, IsActive, GroupId, HasPaid) values (2, '2749631', 'Rolando', 'Student', 'Rivas', 'rolando.student@cgi.com', true, 1, true);
+
