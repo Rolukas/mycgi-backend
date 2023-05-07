@@ -8,6 +8,7 @@ const {
   getUserIdByRequestAuthorizationHeaders,
 } = require("../functions/userFunctions");
 const { getTeacherIdByUserId } = require("../functions/teacherFunctions");
+const { getStudentIdByUserId } = require("../functions/studentFunctions");
 
 const onGetClasses = async (req, res) => {
   try {
@@ -301,7 +302,7 @@ const onGetClassWeeks = async (req, res) => {
         items: [],
         message: "cannot get weeks",
       };
-      res.send(weeksRequest);
+      res.send(response);
       return;
     }
 
@@ -318,9 +319,191 @@ const onGetClassWeeks = async (req, res) => {
   }
 };
 
+const onGetClassesByStudent = async (req, res) => {
+  try {
+    let response;
+
+    //Authorize
+    const auth = await Authorize(req);
+    if (!auth.isAuthorized) {
+      res.status(401).send({ success: false, message: auth.message });
+      return false;
+    }
+
+    const userId = await getUserIdByRequestAuthorizationHeaders(req);
+
+    if (!userId || userId === 0) {
+      response = {
+        success: false,
+        items: [],
+        message: "invalid user id",
+      };
+      res.send(response);
+      return;
+    }
+
+    const studentId = await getStudentIdByUserId(userId);
+
+    if (!studentId || studentId === 0) {
+      response = {
+        success: false,
+        items: [],
+        message: "invalid student id",
+      };
+      res.send(response);
+      return;
+    }
+
+    const classesRequest = await pool.query(`
+      select
+      sc.classid as "classId",
+      s."name" as "subjectName",
+      concat(t.Name, ' ', t.fatherlastname, ' ', t.motherlastname) as "teacherName",
+      (select count(*) from "Attendance" a where a.classid = c.id and a.isattendance <> true) as "numberOfAbsences",
+      c.days as "classDays",
+      c.starthour as "startHour",
+      c.endhour as "endHour"
+      from "StudentClass" sc
+      join "Class" c on c.Id = sc.classid
+      join "Subject" s on s.id = c.subjectid 
+      join "Teacher" t on t.id = c.teacherid 
+      where sc.studentid = ${studentId};
+    `);
+
+    if (classesRequest.rowCount === 0) {
+      response = {
+        success: false,
+        items: [],
+        message: "cannot get weeks",
+      };
+      res.send(response);
+      return;
+    }
+
+    response = {
+      success: true,
+      items: classesRequest.rows,
+      message: "operation completed with success",
+    };
+
+    res.send(response);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ success: false, message: error.toString() });
+  }
+};
+
+const onGetClassDetail = async (req, res) => {
+  try {
+    //Authorize
+    const auth = await Authorize(req);
+    if (!auth.isAuthorized) {
+      res.status(401).send({ success: false, message: auth.message });
+      return false;
+    }
+
+    let response;
+
+    const userId = await getUserIdByRequestAuthorizationHeaders(req);
+
+    if (!userId || userId === 0) {
+      response = {
+        success: false,
+        items: [],
+        message: "invalid user id",
+      };
+      res.send(response);
+      return;
+    }
+
+    const studentId = await getStudentIdByUserId(userId);
+
+    if (!studentId || studentId === 0) {
+      response = {
+        success: false,
+        items: [],
+        message: "invalid student id",
+      };
+      res.send(response);
+      return;
+    }
+
+    const classId = req.params.id;
+
+    if (classId == null) {
+      response = {
+        success: false,
+        items: [],
+        message: "invalid class id",
+      };
+      res.send(response);
+      return;
+    }
+
+    const classRequest = await pool.query(`
+      select 
+      gw.classid,
+      w."number" as "weekNumber",
+      gc."name" as "gradeCriteria",
+      gw.score
+      from "GradeWeek" gw 
+      join "Week" w ON w.id = gw.weekid
+      join "GradeCriteria" gc ON gc.id = gw.criteriaid 
+      where gw.classid = ${classId} and gw.studentid = ${studentId};
+    `);
+
+    if (classRequest.rowCount === 0) {
+      response = {
+        success: false,
+        items: [],
+        message: "cannot get class detail",
+      };
+      res.send(response);
+      return;
+    }
+
+    function transformArray(array) {
+      const transformedArray = [];
+
+      array.forEach((item) => {
+        const { weekNumber, gradeCriteria, score } = item;
+        const existingEntry = transformedArray.find(
+          (entry) => entry.weekNumber === weekNumber
+        );
+
+        if (existingEntry) {
+          existingEntry.grades.push({ gradeCriteria, score: parseInt(score) });
+        } else {
+          transformedArray.push({
+            weekNumber,
+            grades: [{ gradeCriteria, score: parseInt(score) }],
+          });
+        }
+      });
+
+      return transformedArray;
+    }
+
+    const transformedArray = transformArray(classRequest.rows);
+
+    response = {
+      success: true,
+      items: transformedArray,
+      message: "operation completed with success",
+    };
+
+    res.send(response);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ success: false, message: error.toString() });
+  }
+};
+
 module.exports = {
   onGetClasses,
   onCreateClass,
   onGetClassesByTeacher,
   onGetClassWeeks,
+  onGetClassesByStudent,
+  onGetClassDetail,
 };
