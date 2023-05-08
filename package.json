@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon index.js",
-    "start": "node index.js",
+    "dev": "yarn db-migrate up && nodemon index.js",
+    "start": "yarn db-migrate up && node index.js",
     "migration": "node node_modules/db-migrate/bin/db-migrate --sql-file"
   },
   "repository": {
