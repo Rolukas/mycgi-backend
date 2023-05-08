@@ -5,9 +5,10 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "migration && node index.js",
     "dev": "echo \"Building...\" && npm run migration && nodemon index.js",
     "start": "echo \"Building...\" && npm run migration && node index.js",
-    "migration": "node ./node_modules/db-migrate/bin/db-migrate up"
+    "migration": "db-migrate up"
   },
   "repository": {
     "type": "git",
