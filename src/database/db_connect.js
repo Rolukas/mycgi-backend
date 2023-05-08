@@ -13,8 +13,10 @@ const prodStr =
   "postgres://default:na43XGVecIfO@ep-muddy-fog-536071.us-west-2.postgres.vercel-storage.com:5432/verceldb";
 const localStr = 'postgresql://postgres:""@localhost:5432/mycgi';
 
+const useProd = true;
+
 const pool = new Pool({
-  connectionString: prodStr,
-  ssl: false,
+  connectionString: useProd ? prodStr : localStr,
+  ssl: !useProd ? { rejectUnauthorized: false } : true,
 });
 module.exports = pool;
