@@ -5,9 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "echo \"Building...\" && yarn db-migrate up && nodemon index.js",
-    "start": "echo \"Building...\" && yarn db-migrate up && node index.js",
-    "migration": "node node_modules/db-migrate/bin/db-migrate --sql-file"
+    "dev": "echo \"Building...\" && yarn run migration && nodemon index.js",
+    "start": "echo \"Building...\" && yarn run migration && node index.js",
+    "migration": "node node_modules/db-migrate/bin/db-migrate up"
   },
   "repository": {
     "type": "git",

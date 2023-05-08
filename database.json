@@ -5,7 +5,6 @@
         "password": {"ENV": "POSTGRES_PASSWORD"},
         "host": {"ENV": "POSTGRES_HOST"},
         "database": {"ENV": "POSTGRES_DATABASE"},
-        "port": "5432",
         "ssl": true
     },
     "prod": {
@@ -14,7 +13,6 @@
         "password": {"ENV": "POSTGRES_PASSWORD"},
         "host": {"ENV": "POSTGRES_HOST"},
         "database": {"ENV": "POSTGRES_DATABASE"},
-        "port": "5432",
         "ssl": true
     }
 }
