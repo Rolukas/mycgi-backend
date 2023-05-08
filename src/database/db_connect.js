@@ -1,21 +1,12 @@
 const { Pool } = require("pg");
 
-// const pool = new Pool({
-//   host: "localhost",
-//   user: "postgres",
-//   password: "",
-//   database: "mycgi",
-//   port: "5432",
-//   ssl: { rejectUnauthorized: false },
-// });
+const DATABASE_URL = process.env.POSTGRES_URL_NON_POOLING;
 
-const prodStr = process.env.POSTGRES_URL_NON_POOLING + "?sslmode=require";
-const localStr = 'postgresql://postgres:""@localhost:5432/mycgi';
-
-const useProd = true;
+const isProduction = process.env.ENVIRONMENT === "PRODUCTION";
 
 const pool = new Pool({
-  connectionString: useProd ? prodStr : localStr,
-  ssl: !useProd ? { rejectUnauthorized: false } : true,
+  connectionString: DATABASE_URL,
+  ssl: isProduction ? true : { rejectUnauthorized: false },
 });
+
 module.exports = pool;

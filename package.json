@@ -1,25 +1,15 @@
 {
-  "name": "backendteachercloud",
+  "name": "mycgi-backend",
   "version": "1.0.0",
-  "description": "Backend of teacher cloud",
+  "description": "Backend of MyCGI app",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "migration && node index.js",
-    "dev": "echo \"Building...\" && npm run migration && nodemon index.js",
-    "start": "echo \"Building...\" && npm run migration && node index.js",
-    "migration": "db-migrate up"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Rolukas/BackendTeacherCloud.git"
+    "dev": "nodemon index.js",
+    "start": "node index.js"
   },
   "author": "Rolando Sumoza",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/Rolukas/BackendTeacherCloud/issues"
-  },
-  "homepage": "https://github.com/Rolukas/BackendTeacherCloud#readme",
   "dependencies": {
     "cors": "^2.8.5",
     "crypto-js": "^4.0.0",
