@@ -23,5 +23,4 @@ app.use(routes);
 
 const port = process.env.PORT || 3002;
 app.listen(port);
-console.log(process.env);
 console.log(`Server on port: ${port}`);
