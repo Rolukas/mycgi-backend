@@ -2,18 +2,17 @@
     "dev": {
         "driver": "pg",
         "user": "postgres",
-        "password": "na43XGVecIfO",
-        "host": "ep-muddy-fog-536071.us-west-2.postgres.vercel-storage.com",
-        "database": "verceldb",
-        "port": "5432",
-        "ssl": true
+        "password": "",
+        "host": "localhost",
+        "database": "mycgi",
+        "port": "5432"
     },
     "prod": {
         "driver": "pg",
-        "user": "postgres",
-        "password": "na43XGVecIfO",
-        "host": "ep-muddy-fog-536071.us-west-2.postgres.vercel-storage.com",
-        "database": "verceldb",
+        "user": {"ENV": "POSTGRES_USER"},
+        "password": {"ENV": "POSTGRES_PASSWORD"},
+        "host": {"ENV": "POSTGRES_HOST"},
+        "database": {"ENV": "POSTGRES_DATABASE"},
         "port": "5432",
         "ssl": true
     }

@@ -9,7 +9,7 @@ const { Pool } = require("pg");
 //   ssl: { rejectUnauthorized: false },
 // });
 
-const prodStr = process.env.POSTGRES_URL + "?sslmode=require";
+const prodStr = process.env.POSTGRES_URL_NON_POOLING + "?sslmode=require";
 const localStr = 'postgresql://postgres:""@localhost:5432/mycgi';
 
 const useProd = true;
