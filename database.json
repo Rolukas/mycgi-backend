@@ -2,9 +2,9 @@
     "dev": {
         "driver": "pg",
         "user": "postgres",
-        "password": "",
-        "host": "localhost",
-        "database": "mycgi",
+        "password": "na43XGVecIfO",
+        "host": "ep-muddy-fog-536071.us-west-2.postgres.vercel-storage.com",
+        "database": "verceldb",
         "port": "5432"
     }
 }

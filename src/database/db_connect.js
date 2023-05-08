@@ -9,8 +9,12 @@ const { Pool } = require("pg");
 //   ssl: { rejectUnauthorized: false },
 // });
 
+const prodStr =
+  "postgres://default:na43XGVecIfO@ep-muddy-fog-536071.us-west-2.postgres.vercel-storage.com:5432/verceldb";
+const localStr = 'postgresql://postgres:""@localhost:5432/mycgi';
+
 const pool = new Pool({
-  connectionString: 'postgresql://postgres:""@localhost:5432/mycgi',
+  connectionString: prodStr,
   ssl: false,
 });
 module.exports = pool;
