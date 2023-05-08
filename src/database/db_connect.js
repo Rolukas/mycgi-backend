@@ -9,8 +9,7 @@ const { Pool } = require("pg");
 //   ssl: { rejectUnauthorized: false },
 // });
 
-const prodStr =
-  "postgres://default:na43XGVecIfO@ep-muddy-fog-536071.us-west-2.postgres.vercel-storage.com:5432/verceldb?sslmode=require";
+const prodStr = process.env.POSTGRES_URL + "?sslmode=require";
 const localStr = 'postgresql://postgres:""@localhost:5432/mycgi';
 
 const useProd = true;
